@@ -1,0 +1,73 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import geopandas as gpd
+df=pd.read_csv("C:\\Users\\Anshul_Chaudhary\\Downloads\\Electric_Vehicle_Population_Data.csv")
+print(df)
+#cleaning of data
+cleaned_df = df.copy()
+columns_to_check = ['County', 'City', 'Postal Code', 'Electric Utility', '2020 Census Tract']
+cleaned_df = cleaned_df.dropna(subset=columns_to_check)
+cleaned_df['Electric Range'] = cleaned_df['Electric Range'].fillna(0)
+cleaned_df['Base MSRP'] = cleaned_df['Base MSRP'].fillna(0)
+cleaned_df['Legislative District'] = cleaned_df['Legislative District'].fillna(-1)
+cleaned_df['Vehicle Location'] = cleaned_df['Vehicle Location'].fillna('Unknown')
+cleaned_df = cleaned_df.reset_index(drop=True)
+cleaned_df.to_csv("C:\\Users\\Anshul_Chaudhary\\Downloads\\Cleaned_Electric_Vehicle_Population_Data.csv", index=False)
+print("Cleaned dataset saved as :'Cleaned_Electric_Vehiicle_Population_Data")
+print("Data cleaning complete. Cleaned data saved as 'Cleaned_Electric_Vehicle_Data.csv'")
+
+#EV type distribution
+sns.countplot(data=cleaned_df, x='Electric Vehicle Type', hue='Electric Vehicle Type', legend=False, palette='viridis')
+plt.title('EV Type Distribution')
+plt.xticks(rotation=45)
+plt.show()
+#EV adoption trends
+df_year = df['Model Year'].value_counts().sort_index()
+df_year.plot(kind='bar', color='c')
+plt.xlabel('Model Year')
+plt.ylabel('Number of EVs')
+plt.title('EV Adoption Over Model Years')
+plt.show()
+#Geographical distribution
+
+df_county = cleaned_df['County'].value_counts()
+df_county_filtered = df_county[df_county > 10000]
+df_county_filtered.sort_values(ascending=False).plot(kind='line', marker='o', color='m')
+plt.xlabel('County')
+plt.ylabel('Number of EVs')
+plt.title('Counties with More Than 10,000 EVs')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+#Geographical distribution according to cities
+df_city = cleaned_df['City'].value_counts()
+df_city_filtered = df_city[df_city > 5000]
+df_city_filtered.plot(kind='bar', color='g')
+plt.xlabel('City')
+plt.ylabel('Number of EVs')
+plt.title('Cities with More Than 5,000 EVs')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+# 5. Manufacturer & Model Insights
+df_make = df['Make'].value_counts().head(10)
+df_make.plot(kind='bar', color='r')
+plt.xlabel('Make')
+plt.ylabel('Count')
+plt.title('Top 10 EV Manufacturers')
+plt.show()
+#Utility Provider analysis
+df_utility = cleaned_df['Electric Utility'].value_counts().head(10)
+df_utility.plot(kind='barh', color='orange')
+plt.xlabel('Number of EVs')
+plt.ylabel('Electric Utility Provider')
+plt.title('Top 10 Electric Utility Providers for EVs')
+plt.show()
+
+
+#CAFV
+sns.countplot(data=df, y='Clean Alternative Fuel Vehicle (CAFV) Eligibility', hue='Clean Alternative Fuel Vehicle (CAFV) Eligibility', legend=False, palette='coolwarm')
+plt.title('CAFV Eligibility Impact on EVs')
+plt.show()
